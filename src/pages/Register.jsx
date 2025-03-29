@@ -1,12 +1,29 @@
 import { useState } from "react";
 import { Link } from "react-router";
-
+import { useForm } from "react-hook-form";
+import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
 
 export const Register = () => {
+
     const [showPassword, setShowPassword] = useState(false);
+    const { register, handleSubmit, formState: { errors } } = useForm();
+
+
+    const registro = async (data) => {
+        try {
+            const url = "http://localhost:3000/api/registro"
+            const respuesta = await axios.post(url,data)
+            toast.success(respuesta.data.msg)
+        } catch (error) {
+            toast.error(error.response.data.msg)
+        }
+    }
 
     return (
         <div className="flex flex-col sm:flex-row h-screen">
+
+            <ToastContainer />
 
             {/* Sección de formulario de registro */}
             <div className="w-full sm:w-1/2 h-screen bg-white flex justify-center items-center">
@@ -15,38 +32,53 @@ export const Register = () => {
                     {/* Contenedor del formulario */}
 
                     <h1 className="text-3xl font-semibold mb-2 text-center uppercase text-gray-500">Bienvenido(a)</h1>
-                    <small className="text-gray-400 block my-4 text-sm">Por favor ingresa tus datos</small> 
-                    
-                    <form>
+                    <small className="text-gray-400 block my-4 text-sm">Por favor ingresa tus datos</small>
+
+                    <form onSubmit={handleSubmit(registro)}>
 
                         {/* Campo para nombre */}
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold">Nombre</label>
-                            <input type="text" placeholder="Ingresa tu nombre" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" />
+                            <input type="text" placeholder="Ingresa tu nombre" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500"
+                            {...register("nombre", { required: "El nombre es obligatorio" })}
+                            />
+                            {errors.nombre && <p className="text-red-800">{errors.nombre.message}</p>}
                         </div>
 
                         {/* Campo para apellido */}
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold">Apellido</label>
-                            <input type="text" placeholder="Ingresa tu apellido" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" />
+                            <input type="text" placeholder="Ingresa tu apellido" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" 
+                            {...register("apellido", { required: "El apellido es obligatorio" })}
+                            />
+                            {errors.apellido && <p className="text-red-800">{errors.apellido.message}</p>}
                         </div>
 
                         {/* Campo para dirección */}
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold">Dirección</label>
-                            <input type="text" placeholder="Ingresa tu dirección de domicilio" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" />
+                            <input type="text" placeholder="Ingresa tu dirección de domicilio" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" 
+                            {...register("direccion", { required: "La direccion es obligatorio" })}
+                            />
+                            {errors.direccion && <p className="text-red-800">{errors.direccion.message}</p>}
                         </div>
                         
                         {/* Campo para celular */}
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold">Celular</label>
-                            <input type="number" placeholder="Ingresa tu celular" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" />
+                            <input type="number" placeholder="Ingresa tu celular" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" 
+                            {...register("celular", { required: "El celular es obligatorio" })}
+                            />
+                            {errors.celular && <p className="text-red-800">{errors.celular.message}</p>}
                         </div>
-
+                        
                         {/* Campo para correo electrónico */}
                         <div className="mb-3">
                             <label className="mb-2 block text-sm font-semibold">Correo electrónico</label>
-                            <input type="email" placeholder="Ingresa tu correo electrónico" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" />
+                            <input type="email" placeholder="Ingresa tu correo electrónico" className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500" 
+                            {...register("email", { required: "El correo electrónico es obligatorio" })}
+                            />
+                            {errors.email && <p className="text-red-800">{errors.email.message}</p>}
                         </div>
 
                         {/* Campo para contraseña */}
@@ -57,7 +89,9 @@ export const Register = () => {
                                     type={showPassword ? "text" : "password"} // Cambia el tipo del input entre 'text' y 'password' según el estado
                                     placeholder="********************"
                                     className="block w-full rounded-md border border-gray-300 focus:border-purple-700 focus:outline-none focus:ring-1 focus:ring-purple-700 py-1 px-1.5 text-gray-500 pr-10"
+                                    {...register("password", { required: "La contraseña es obligatorio" })}
                                 />
+                                    {errors.password && <p className="text-red-800">{errors.password.message}</p>}
                                 {/* Botón para mostrar/ocultar la contraseña */}
                                 <button
                                     type="button"
@@ -84,6 +118,9 @@ export const Register = () => {
                         </div>
 
                     </form>
+
+                    {/* Línea separadora */}
+                    <div className="mt-5 text-xs border-b-2 py-4"></div>
 
                     {/* Enlace para iniciar sesión si ya tiene una cuenta */}
                     <div className="mt-3 text-sm flex justify-between items-center">

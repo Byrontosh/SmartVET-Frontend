@@ -1,5 +1,5 @@
 const API_URL ="https://router.huggingface.co/hf-inference/models/stabilityai/stable-diffusion-xl-base-1.0"
-const API_KEY = import.meta.env.VITE_HF_API_KEY
+const API_KEY = import.meta.env.VITE_HUGGINGFACE_API_KEY
 
 async function generateAvatar(data) {
 

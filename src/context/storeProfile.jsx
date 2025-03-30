@@ -11,7 +11,10 @@ const storeProfile = create((set) => ({
         profile: async () => {
             try {
                 const storedUser = JSON.parse(localStorage.getItem("auth-token"))
-                const url = `${import.meta.env.VITE_BACKEND_URL}/perfil`;
+                const endpoint = storedUser.state.rol ==="veterinario"
+                ? "perfil"
+                : "paciente/perfil"
+                const url = `${import.meta.env.VITE_BACKEND_URL}/${endpoint}`;
                 const options = {
                     headers: {
                         "Content-Type": "application/json",

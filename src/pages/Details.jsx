@@ -1,15 +1,38 @@
-/* eslint-disable no-unused-vars */
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import TableTreatments from "../components/treatments/Table"
 import ModalTreatments from "../components/treatments/Modal"
-
+import { useParams } from "react-router"
+import useFetch from "../hooks/useFetch"
+import storeAuth from "../context/storeAuth"
 
 
 const Details = () => {
-    
+    const { id } = useParams()
+    const [patient, setPatient] = useState({})
+    const [treatments, setTreatments] = useState([])
+    const { fetchDataBackend } = useFetch()
+    const { rol } = storeAuth()
 
-    const [treatments, setTreatments] = useState(["demo"])
+    const listPatient = async () => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/paciente/${id}`
+        const storedUser = JSON.parse(localStorage.getItem("auth-token"))
+        const options = {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${storedUser.state.token}`,
+            }
+        }
+        const response = await fetchDataBackend(url, null, "GET", options.headers)
+        setPatient(response)
+    }
 
+    const formatDate = (date) => {
+        return new Date(date).toLocaleDateString('es-EC', { dateStyle: 'long', timeZone: 'UTC' })
+    }
+
+    useEffect(() => {
+        listPatient()
+    }, [])
 
 
     return (
@@ -31,19 +54,19 @@ const Details = () => {
 
                             <ul className="pl-5">
                                 <li className="text-md text-gray-00 mt-2">
-                                    <span className="text-gray-600 font-bold">Cédula: </span>
+                                    <span className="text-gray-600 font-bold">Cédula: {patient?.cedulaPropietario} </span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-2">
-                                    <span className="text-gray-600 font-bold">Nombres completos: </span>
+                                    <span className="text-gray-600 font-bold">Nombres completos: {patient?.nombrePropietario}</span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-2">
-                                    <span className="text-gray-600 font-bold">Correo electrónico: </span>
+                                    <span className="text-gray-600 font-bold">Correo electrónico: {patient?.emailPropietario}</span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-2">
-                                <span className="text-gray-600 font-bold">Celular: </span>
+                                    <span className="text-gray-600 font-bold">Celular: {patient?.celularPropietario}</span>
                                 </li>
                             </ul>
 
@@ -53,25 +76,26 @@ const Details = () => {
 
                             <ul className="pl-5">
                                 <li className="text-md text-gray-00 mt-2">
-                                    <span className="text-gray-600 font-bold">Nombre: </span>
+                                    <span className="text-gray-600 font-bold">Nombre: {patient?.nombreMascota}</span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-2">
-                                    <span className="text-gray-600 font-bold">Tipo: </span>
+                                    <span className="text-gray-600 font-bold">Tipo: {patient?.tipoMascota}</span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-2">
-                                    <span className="text-gray-600 font-bold">Fecha de nacimiento: </span>
+                                    <span className="text-gray-600 font-bold">Fecha de nacimiento: {formatDate(patient?.fechaNacimientoMascota)}</span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-2">
                                     <span className="text-gray-600 font-bold">Estado: </span>
                                     <span className="bg-blue-100 text-green-500 text-xs font-medium mr-2 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                                        {patient?.estadoMascota && "activo"}
                                     </span>
                                 </li>
 
                                 <li className="text-md text-gray-00 mt-4">
-                                    <span className="text-gray-600 font-bold">Síntoma u Observación: </span>
+                                    <span className="text-gray-600 font-bold">Síntomas: {patient?.sintomasMascota}</span>
                                 </li>
 
                             </ul>
@@ -79,7 +103,7 @@ const Details = () => {
                     </div>
 
                     <div>
-                    <img src="https://cdn-icons-png.flaticon.com/512/2138/2138440.png" alt="dogandcat" className='h-80 w-80' />
+                        <img src={patient?.avatarMascota || patient?.avatarMascotaIA} alt="dogandcat" className='h-80 w-80 rounded-full' />
                     </div>
                 </div>
 
@@ -87,9 +111,10 @@ const Details = () => {
 
                 <div className='flex justify-between items-center'>
 
-                    <p>Este módulo te permite gestionar tratamientos</p>
+                    <p>Este módulo te permite gestionar los tratamientos</p>
+
                     {
-                        true &&
+                        rol === "veterinario" &&
                         (
                             <button className="px-5 py-2 bg-green-800 text-white rounded-lg hover:bg-green-700">
                                 Registrar
@@ -97,7 +122,7 @@ const Details = () => {
                         )
                     }
 
-                    {false  && (<ModalTreatments/>)}
+                    {false && (<ModalTreatments />)}
 
                 </div>
 
